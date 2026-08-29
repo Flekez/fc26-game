@@ -4,43 +4,43 @@ const menuData = {
         title: 'Manager Career',
         description: 'Are you ready to lead a club straight off the pitch?',
         subtitle: 'Adapt a philosophy | Design the future | Compete around the world',
-        circle: 'MC'
+        playerImage: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80'
     },
     'pro-clubs': {
         title: 'Pro Clubs',
         description: 'Team up with your friends and compete in the ultimate team experience.',
         subtitle: 'Create a Pro | Build your legacy | Rise to the top',
-        circle: 'PC'
+        playerImage: 'https://images.unsplash.com/photo-1518611505868-48510c2e022f?w=800&q=80'
     },
     'ultimate-team': {
         title: 'Ultimate Team',
         description: 'Assemble your dream squad and dominate the competition.',
         subtitle: 'Pack | Build | Compete | Conquer',
-        circle: 'UT'
+        playerImage: 'https://images.unsplash.com/photo-1552521482-18a18b9173f3?w=800&q=80'
     },
     'player-career': {
         title: 'Player Career',
         description: 'Rise from youth academy to legendary status.',
         subtitle: 'Train | Develop | Compete | Become a legend',
-        circle: 'PC'
+        playerImage: 'https://images.unsplash.com/photo-1489944908914-47a3b316c039?w=800&q=80'
     },
     'clubs': {
         title: 'Clubs',
         description: 'Explore and manage your favorite football clubs.',
         subtitle: 'Manage | Strategize | Lead | Triumph',
-        circle: 'CL'
+        playerImage: 'https://images.unsplash.com/photo-1516585427867-ae6c47bcc89f?w=800&q=80'
     },
     'kick-off': {
         title: 'Kick Off',
         description: 'Play instant matches with any team and any player.',
         subtitle: 'Quick play | Customizable | Pure football action',
-        circle: 'KO'
+        playerImage: 'https://images.unsplash.com/photo-1517466895261-61b78f55e856?w=800&q=80'
     },
     'learn-to-play': {
         title: 'Learn To Play',
         description: 'Master the game with comprehensive tutorials and guides.',
         subtitle: 'Tutorials | Tips | Tactics | Improve your skills',
-        circle: 'LP'
+        playerImage: 'https://images.unsplash.com/photo-1542208496-0fcd80fcb092?w=800&q=80'
     }
 };
 
@@ -49,11 +49,14 @@ const menuItems = document.querySelectorAll('.menu-item');
 const mainTitle = document.getElementById('main-title');
 const mainDescription = document.getElementById('main-description');
 const mainSubtitle = document.getElementById('main-subtitle');
-const logoCircle = document.querySelector('.logo-circle');
 const playButton = document.getElementById('play-btn');
 const background = document.getElementById('background');
+const playerImage = document.getElementById('player-image');
+const backgroundMusic = document.getElementById('background-music');
+const musicBtn = document.getElementById('music-btn');
 
 let currentMenu = 'manager-career';
+let isMusicPlaying = false;
 
 // Initialize with default content
 function initializeContent() {
@@ -69,15 +72,17 @@ function setMenuContent(menuKey) {
     mainTitle.style.opacity = '0';
     mainDescription.style.opacity = '0';
     mainSubtitle.style.opacity = '0';
-    logoCircle.style.opacity = '0';
+    playerImage.style.opacity = '0';
     
     setTimeout(() => {
         // Update content
         mainTitle.textContent = data.title;
         mainDescription.textContent = data.description;
         mainSubtitle.textContent = data.subtitle;
-        logoCircle.textContent = data.circle;
-        playButton.textContent = `► Expand ${data.title}`;
+        playButton.textContent = `► EXPAND ${data.title.toUpperCase()}`;
+        
+        // Update player image
+        playerImage.style.backgroundImage = `url('${data.playerImage}')`;
         
         // Update background
         background.classList.remove(...Object.keys(menuData).map(key => key));
@@ -87,7 +92,7 @@ function setMenuContent(menuKey) {
         mainTitle.style.opacity = '1';
         mainDescription.style.opacity = '1';
         mainSubtitle.style.opacity = '1';
-        logoCircle.style.opacity = '1';
+        playerImage.style.opacity = '0.8';
     }, 200);
     
     currentMenu = menuKey;
@@ -114,7 +119,23 @@ playButton.addEventListener('click', () => {
     console.log(`Launching: ${currentMenu}`);
 });
 
-// Initialize on load
+// Music control
+musicBtn.addEventListener('click', () => {
+    if (isMusicPlaying) {
+        backgroundMusic.pause();
+        musicBtn.textContent = '🔇';
+    } else {
+        backgroundMusic.play().catch(e => {
+            console.log('Audio playback failed:', e);
+            alert('Unable to play audio. Try enabling audio in your browser settings.');
+        });
+        musicBtn.textContent = '🎵';
+    }
+    isMusicPlaying = !isMusicPlaying;
+    musicBtn.classList.toggle('playing');
+});
+
+// Try to autoplay music on load
 window.addEventListener('DOMContentLoaded', () => {
     initializeContent();
     
@@ -126,5 +147,18 @@ window.addEventListener('DOMContentLoaded', () => {
     mainTitle.style.transition = 'opacity 0.3s ease';
     mainDescription.style.transition = 'opacity 0.3s ease';
     mainSubtitle.style.transition = 'opacity 0.3s ease';
-    logoCircle.style.transition = 'opacity 0.4s ease';
+    playerImage.style.transition = 'opacity 0.4s ease';
+    
+    // Attempt autoplay (will likely be blocked)
+    backgroundMusic.volume = 0.3;
+    backgroundMusic.play().catch(() => {
+        console.log('Autoplay blocked. User must click music button.');
+    });
+});
+
+// Stop music when tab is closed or hidden
+document.addEventListener('visibilitychange', () => {
+    if (document.hidden && isMusicPlaying) {
+        backgroundMusic.pause();
+    }
 });
